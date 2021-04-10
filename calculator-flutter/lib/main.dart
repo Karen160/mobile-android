@@ -34,11 +34,11 @@ class _CalculatorState extends State < Calculator > {
   static
   const List < List < String >> grid = < List < String >> [
 
-    <
-    String > ["7", "8", "9", "-"], <
-    String > ["4", "5", "6", "*"], <
-    String > ["1", "2", "3", "/"], <
-    String > ["0", ".", "=", "+"],
+    < String > ["CE", "C"], 
+    < String > ["7", "8", "9", "-"], 
+    < String > ["4", "5", "6", "*"], 
+    < String > ["1", "2", "3", "/"], 
+    < String > ["0", ".", "=", "+"],
   ];
   @override
   Widget build(BuildContext context) {
@@ -109,6 +109,13 @@ class _CalculatorState extends State < Calculator > {
         break;
       case '=':
         onEquals();
+        break;
+      case 'C':
+        onResetDigit(value);
+        break;
+      case 'CE':
+        onResetAllDigit(value);
+        break;
     }
 
     // Force l'interface à se redessiner
@@ -116,15 +123,55 @@ class _CalculatorState extends State < Calculator > {
   }
 
   void onNewDigit(String digit) {
-    // TODO
+    if(input == null){
+      input = 0;
+    }
+    var nombre = input!.toInt() * 10 + int.parse(digit);
+    input = double.parse(nombre.toString());
   }
 
   void onNewSymbol(String digit) {
-    // TODO
+    if(input == 0){
+      previousInput = 0;
+      symbol = digit;
+    }else{
+      symbol = digit;
+      previousInput = input;
+      input = 0;
+    }
+   
   }
 
   void onEquals() {
-    // TODO
+    if(symbol == "+"){
+      var result = input!.toInt() + previousInput!.toInt();
+      input = result.toDouble();
+    }else if(symbol == "-"){
+      var result = previousInput!.toInt() - input!.toInt();
+       input = result.toDouble();
+    }else if(symbol == "/"){
+       if(input == 0){
+          input = 0;
+          previousInput = 0;
+          symbol = null;
+       }else{
+         var result = previousInput!.toInt() / input!.toInt();
+         input = result.toDouble();
+       }
+    }else if(symbol == "*"){
+      var result = input!.toInt() * previousInput!.toInt();
+      input = result.toDouble();
+    }
+  }
+
+  void onResetDigit(String digit){
+    input = 0;
+  }
+
+  void onResetAllDigit(String digit){
+    input = 0;
+    symbol = null;
+    previousInput = 0;
   }
 }
 class InputButton extends StatelessWidget {
