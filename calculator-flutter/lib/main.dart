@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:calculator/res/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -26,10 +27,12 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State < Calculator > {
-
+  
   double ? input;
   double ? previousInput;
   String ? symbol;
+  bool ? virgule;
+  int point = 0;
 
   static
   const List < List < String >> grid = < List < String >> [
@@ -110,6 +113,9 @@ class _CalculatorState extends State < Calculator > {
       case '=':
         onEquals();
         break;
+      case '.':
+        onPoint();
+      break;
       case 'C':
         onResetDigit(value);
         break;
@@ -123,11 +129,24 @@ class _CalculatorState extends State < Calculator > {
   }
 
   void onNewDigit(String digit) {
+    double nombre;
+    int variable;
+    int decimal;
+
     if(input == null){
       input = 0;
+      nombre = input! * 10 + int.parse(digit);
+      input = double.parse(nombre.toString()) ;
+    }else if(virgule == true){
+      variable = point + 1;
+      decimal = (pow(10, variable)).toInt();
+      nombre = (int.parse(digit) / decimal) + input!;
+      input = double.parse(nombre.toString());    
+      point += 1;
+    }else{
+      nombre = input! * 10 + int.parse(digit);
+      input = double.parse(nombre.toString());
     }
-    var nombre = input!.toInt() * 10 + int.parse(digit);
-    input = double.parse(nombre.toString());
   }
 
   void onNewSymbol(String digit) {
@@ -138,16 +157,17 @@ class _CalculatorState extends State < Calculator > {
       symbol = digit;
       previousInput = input;
       input = 0;
+      virgule = false;
+      point = 0;
     }
-   
   }
 
   void onEquals() {
     if(symbol == "+"){
-      var result = input!.toInt() + previousInput!.toInt();
+      var result = input! + previousInput!;
       input = result.toDouble();
     }else if(symbol == "-"){
-      var result = previousInput!.toInt() - input!.toInt();
+      var result = previousInput! - input!;
        input = result.toDouble();
     }else if(symbol == "/"){
        if(input == 0){
@@ -155,23 +175,31 @@ class _CalculatorState extends State < Calculator > {
           previousInput = 0;
           symbol = null;
        }else{
-         var result = previousInput!.toInt() / input!.toInt();
+         var result = previousInput! / input!;
          input = result.toDouble();
        }
     }else if(symbol == "*"){
-      var result = input!.toInt() * previousInput!.toInt();
+      var result = input! * previousInput!;
       input = result.toDouble();
     }
   }
 
   void onResetDigit(String digit){
     input = 0;
+    virgule = false;
+    point = 0;
   }
 
   void onResetAllDigit(String digit){
     input = 0;
     symbol = null;
     previousInput = 0;
+    virgule = false;
+    point = 0;
+  }
+
+  void onPoint(){
+    virgule = true;
   }
 }
 class InputButton extends StatelessWidget {
